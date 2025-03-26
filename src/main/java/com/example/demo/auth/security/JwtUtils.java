@@ -1,28 +1,41 @@
 package com.example.demo.auth.security;
 
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.Base64;
+import javax.crypto.SecretKey;
 
 @Component
 public class JwtUtils {
 
-    private final String SECRET_KEY = "your_secret_key";
-    private final long EXPIRATION_TIME = 86400000; // 1 ngày
+    @Value("${jwt.secret}")
+    private String secretKeyBase64; // Lấy từ application.properties
+
+    @Value("${jwt.expiration}")
+    private long EXPIRATION_TIME; // Lấy từ application.properties
+
+    private SecretKey getSigningKey() {
+        byte[] keyBytes = Base64.getDecoder().decode(secretKeyBase64);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
 
     public String generateToken(String username) {
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
     public String extractUsername(String token) {
-        return Jwts.parser()
-                .setSigningKey(SECRET_KEY)
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
