@@ -8,6 +8,11 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import java.util.List;
+import java.util.stream.Collectors; // <--- IMPORT NÀY
+import com.example.demo.auth.model.Auth; // <--- Đảm bảo import Model User nếu chưa có
+import org.springframework.security.access.AccessDeniedException;
+
 
 @Service
 @RequiredArgsConstructor
@@ -35,14 +40,37 @@ public class AuthService {
     }
 
     public AuthResponse login(LoginRequest request) {
+        System.out.println("Login attempt: " + request.getUsername());
+
         Auth user = authRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> {
+                    System.err.println("User not found: " + request.getUsername());
+                    return new RuntimeException("User not found");
+                });
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid password");
+            System.err.println("Invalid password for user: " + request.getUsername());
+        throw new RuntimeException("Invalid password");
         }
 
         String token = jwtUtils.generateToken(user.getUsername());
+        System.out.println("Generated token for user: " + request.getUsername());
+        
         return new AuthResponse(token);
     }
+
+    public List<UserResponse> getUsers() {
+        return authRepository.findAll().stream()
+            .map(user -> new UserResponse(user.getId(), user.getUsername(), user.getEmail(), user.getRole().name()))
+            .collect(Collectors.toList());
+    }
+    
+    public Auth updateUserRole(UpdateRoleRequest request) {
+        Auth user = authRepository.findByEmail(request.getEmail())
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setRole(Role.valueOf(request.getRole()));
+        return authRepository.save(user);
+    }
+
 }

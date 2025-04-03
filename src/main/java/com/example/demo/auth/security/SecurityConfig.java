@@ -18,12 +18,26 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http.authorizeHttpRequests((authorize) -> authorize
-                    .requestMatchers("/**").permitAll()
-            ).csrf(csrf -> csrf
-            .ignoringRequestMatchers("/**") );
+        http.authorizeHttpRequests((authorize) -> authorize
+                        .requestMatchers("/**").permitAll()
+                ).csrf(csrf -> csrf
+                .ignoringRequestMatchers("/**") );
 
 
-    return http.build();
-}
+        return http.build();
+    }
+
+    // @Bean
+    // public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    //     http
+    //         .authorizeHttpRequests(authorize -> authorize
+    //             .requestMatchers("/api/auth/**").permitAll()  // Cho phép các API authentication (login/register)
+    //             .requestMatchers("/admin/**").hasRole("ADMIN") // Chỉ ADMIN truy cập
+    //             .anyRequest().authenticated() // Các API khác phải đăng nhập
+    //         )
+    //         .csrf(csrf -> csrf.ignoringRequestMatchers("/api/auth/**")) // Chỉ tắt CSRF cho API Auth
+    //         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // JWT không dùng session
+
+    //     return http.build();
+    // }
 }
