@@ -51,6 +51,20 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	 // Xử lý CORS
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+	// MapStruct for Object Mapping
+	implementation 'org.mapstruct:mapstruct:1.5.3.Final'  // Kiểm tra phiên bản mới nhất nếu cần
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'  // Cần thiết cho annotation processing
+
+	    // Swagger annotations
+    implementation 'io.swagger.core.v3:swagger-annotations:2.2.1'
+
+    // SpringDoc for OpenAPI integration with Spring Boot
+    implementation 'org.springdoc:springdoc-openapi-ui:1.6.9'
+
+    // Spring HATEOAS
+	implementation 'org.springframework.data:spring-data-commons:3.4.3'
+    implementation 'org.springframework.hateoas:spring-hateoas:2.1.1'
 }
 
 tasks.named('test') {
