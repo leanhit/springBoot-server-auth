@@ -8,6 +8,7 @@ import com.example.demo.restaurant.dto.ItemDto;
 import com.example.demo.restaurant.exception.ResourceNotFoundException;
 import com.example.demo.restaurant.mapper.ItemMapper;
 import com.example.demo.restaurant.repository.ItemRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,6 +21,7 @@ public class ItemService {
 
     private final ItemMapper itemMapper;
 
+    @Transactional(readOnly = true)
     public Page<ItemDto> findAllItems(Pageable pageable) {
         return itemRepository.findAll(pageable).map(itemMapper::toDto);
     }
